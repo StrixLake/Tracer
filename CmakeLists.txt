@@ -1,0 +1,19 @@
+cmake_minimum_required(VERSION 3.5)
+
+set(CMAKE_PREFIX_PATH "C:/Users/yasha/Documents/Projects/fmt/build/")
+set(CMAKE_CXX_STANDARD 17)
+
+project(Tracer)
+
+
+add_executable(main main.cpp)
+
+target_include_directories(main PUBLIC "C:\\Users\\yasha\\Documents\\Projects\\stb\\"
+                                PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+
+find_package(fmt REQUIRED)
+find_package(OpenCL REQUIRED)
+
+target_link_libraries(main PUBLIC OpenCL::OpenCL
+                           PUBLIC fmt::fmt)
+
