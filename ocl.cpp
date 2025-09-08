@@ -1,9 +1,7 @@
-#include <CL/cl.h>
 #include <fstream>
 #include <ios>
 #include <iterator>
 #include <ocl.h>
-#include <fmt/base.h>
 #include <string>
 
 
@@ -57,6 +55,9 @@ void initialize_resources(cl_resource* resource){
     fmt::print("Context creation return code: {0}\n", int_ret);
 
     compile_kernels(resource);
+
+    resource->queue = clCreateCommandQueueWithProperties(resource->context, resource->device, NULL, &int_ret);
+    fmt::print("Command queue creation return code: {0}\n", int_ret);
     
     return;
 
