@@ -4,6 +4,7 @@
 #include <stb_image_write.h>
 #include <ocl.h>
 #include <viewport.h>
+#include <schedular.h>
 
 
 int main(){
@@ -14,7 +15,6 @@ int main(){
     size_t size_ret;
 
     Memory memory(&resource);
-    create_viewport(&resource, &memory, 100);
 
     return 0;
 }
