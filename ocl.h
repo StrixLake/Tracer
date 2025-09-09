@@ -5,15 +5,13 @@
 // provides a struct to hold
 // all the necessary cl objects
 
-#ifndef OCL
-#define OCL
+#pragma once
 #define CL_TARGET_OPENCL_VERSION 300
 #include <cl/cl.h>
 #include <fmt/base.h>
-#endif
+#include <config.h>
 
-#define PLATFORM 0
-#define DEVICE 0
+
 
 struct cl_resource{
     cl_platform_id platform;
@@ -33,11 +31,24 @@ struct cl_resource{
 };
 
 struct Kernels{
-    static constexpr char adderN[] = "adder";
-    static const size_t adderS = sizeof(adderN);
+    static constexpr char adder[] = "adder";
 };
 
 struct Memory{
+
+    Memory(cl_resource* resource){
+        cl_int int_ret;
+        intersect = clCreateBuffer(resource->context, CL_MEM_READ_WRITE, VRES*VRES*ASPECT_RATIO*sizeof(float), NULL, &int_ret);
+        fmt::print("Intersect matrix allocation return code: {0}\n", int_ret);
+        origin = clCreateBuffer(resource->context, CL_MEM_READ_WRITE, VRES*VRES*ASPECT_RATIO*3*sizeof(float), NULL, &int_ret);
+        fmt::print("Origin matrix allocation return code: {0}\n", int_ret);
+        direction = clCreateBuffer(resource->context, CL_MEM_READ_WRITE, VRES*VRES*ASPECT_RATIO*3*sizeof(float), NULL, &int_ret);
+        fmt::print("Direction matrix allocation return code: {0}\n", int_ret);
+        color = clCreateBuffer(resource->context, CL_MEM_READ_WRITE, VRES*VRES*ASPECT_RATIO*3*sizeof(float), NULL, &int_ret);
+        fmt::print("Color matrix allocation return code: {0}\n", int_ret);
+        return;
+    }
+
     cl_mem origin;
     cl_mem direction;
     cl_mem intersect;
