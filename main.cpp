@@ -16,6 +16,7 @@ int main(){
 
     Memory memory(&resource);
     
+    create_viewport(&resource, &memory);
 
     return 0;
 }

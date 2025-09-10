@@ -18,7 +18,6 @@ void CL_CALLBACK work_complete(cl_event event, cl_int status, void* data){
 // that many work groups at once, each work group
 // will have (8,8) work items
 // the kernel must have its arguments already set
-// and the event object is the event that the first command will wait on
 cl_event schedule_work(cl_resource* resource, cl_kernel* kernel){
     cl_uint uint_ret;
     cl_int int_ret;

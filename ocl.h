@@ -32,6 +32,8 @@ struct cl_resource{
 
 struct Kernels{
     static constexpr char adder[] = "adder";
+    static constexpr char viewport[] = "viewport";
+
 };
 
 struct Memory{
