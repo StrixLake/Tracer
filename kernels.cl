@@ -2,30 +2,22 @@
 #define VRES 80
 #define APERTURE 100
 
-__kernel void adder(__global int* a){
+int get_offset(){
     int block = get_global_id(0);
     int y = get_global_id(1);
     int x = get_global_id(2);
     
+
     // determine the pixel
     size_t blocky = block / (VRES*ASPECT_RATIO/8);
     size_t blockx = block % (VRES*ASPECT_RATIO/8);
     int offset = (blocky * 8 * VRES*ASPECT_RATIO) + (VRES*ASPECT_RATIO*y) + (blockx * 8) + (x);
-    a[offset] = offset;
-
+    return offset;
 }
 
-
 __kernel void viewport(__global float* intersect, __global float* origin, __global float* direction, __global float* color, float focal_length){
-    int block = get_global_id(0);
-    int y = get_global_id(1);
-    int x = get_global_id(2);
-    
-
-    // determine the pixel
-    size_t blocky = block / (VRES*ASPECT_RATIO/8);
-    size_t blockx = block % (VRES*ASPECT_RATIO/8);
-    int offset = (blocky * 8 * VRES*ASPECT_RATIO) + (VRES*ASPECT_RATIO*y) + (blockx * 8) + (x);
+   
+    int offset = get_offset();
     int rbgOffset = 3*offset;
 
     // focal length is in the z direction
@@ -48,13 +40,11 @@ __kernel void viewport(__global float* intersect, __global float* origin, __glob
 
     float3 normal = normalize(pixel);
 
-    origin[rbgOffset] = pixel.x;
-    origin[rbgOffset+1] = pixel.y;
-    origin[rbgOffset+2] = pixel.z;
+    // vstoren computes the 3* offset internally
+    // so no need to give it rbgoffset
+    vstore3(pixel, offset, origin);
 
-    direction[rbgOffset] = normal.x;
-    direction[rbgOffset+1] = normal.y;
-    direction[rbgOffset+2] = normal.z;
+    vstore3(normal, offset, direction);
+
     return;
-
 }   
