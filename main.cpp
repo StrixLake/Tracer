@@ -15,6 +15,7 @@ int main(){
     size_t size_ret;
 
     Memory memory(&resource);
+    
 
     return 0;
 }
