@@ -1,6 +1,5 @@
 #define ASPECT_RATIO 2
 #define VRES 80
-#define FOCAL_LENGTH 100
 #define APERTURE 100
 
 __kernel void adder(__global int* a){
@@ -17,12 +16,11 @@ __kernel void adder(__global int* a){
 }
 
 
-__kernel void viewport(__global float* intersect, __global float* origin, __global float* direction, __global float* color){
+__kernel void viewport(__global float* intersect, __global float* origin, __global float* direction, __global float* color, float focal_length){
     int block = get_global_id(0);
     int y = get_global_id(1);
     int x = get_global_id(2);
     
-    float focal_length = FOCAL_LENGTH;
 
     // determine the pixel
     size_t blocky = block / (VRES*ASPECT_RATIO/8);

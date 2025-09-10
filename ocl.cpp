@@ -51,6 +51,9 @@ void initialize_resources(cl_resource* resource){
     clGetDeviceInfo(resource->device, CL_DEVICE_NAME, size_ret, name.data(), &size_ret);
     fmt::print("Name of the device: {0}\n", name);
 
+    int_ret = clGetDeviceInfo(resource->device, CL_DEVICE_MAX_COMPUTE_UNITS, sizeof(uint_ret), &uint_ret, NULL);
+    fmt::print("device has {0} compute units\n", uint_ret);
+
     resource->context = clCreateContext(NULL, 1, &resource->device, NULL, NULL, &int_ret);
     fmt::print("Context creation return code: {0}\n", int_ret);
 
