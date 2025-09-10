@@ -24,7 +24,6 @@ cl_event schedule_work(cl_resource* resource, cl_kernel* kernel){
 
     // get the number of work group processors
     int_ret = clGetDeviceInfo(resource->device, CL_DEVICE_MAX_COMPUTE_UNITS, sizeof(uint_ret), &uint_ret, NULL);
-    fmt::print("device has {0} compute units\n", uint_ret);
     cl_uint wgp = uint_ret;
 
     // calculate the total number of work groups required
