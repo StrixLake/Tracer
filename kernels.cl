@@ -48,3 +48,14 @@ __kernel void viewport(__global float* intersect, __global float* origin, __glob
 
     return;
 }   
+
+
+__kernel void intersector(__global float* intersect, __global float* origin, __global float* direction, __global float* color, __global float* spheres, int sphere_count){
+    
+    int offset = get_offset();
+    float3 x = vload3(0, spheres);
+
+    vstore3(x, offset, color);
+
+    return;
+}

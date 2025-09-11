@@ -33,6 +33,7 @@ struct cl_resource{
 struct Kernels{
     static constexpr char adder[] = "adder";
     static constexpr char viewport[] = "viewport";
+    static constexpr char intersector[] = "intersector";
 
 };
 
@@ -63,6 +64,7 @@ struct Memory{
         clReleaseMemObject(direction);
         clReleaseMemObject(intersect);
         clReleaseMemObject(color);
+        clReleaseMemObject(spheres);
         return;
     }
 };

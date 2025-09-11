@@ -19,5 +19,6 @@ void create_viewport(cl_resource* resource, Memory* memory){
     int_ret = clReleaseKernel(kernel);
     fmt::print("Error code from release kernel inside viewport: {0}\n", int_ret);
     clWaitForEvents(1, &event);
+    fmt::print("\n");
     return;
 }
