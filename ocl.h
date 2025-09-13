@@ -34,6 +34,7 @@ struct Kernels{
     static constexpr char adder[] = "adder";
     static constexpr char viewport[] = "viewport";
     static constexpr char intersector[] = "intersector";
+    static constexpr char compile_options[] = "-g -cl-opt-disable -s 'C:\\Users\\yasha\\Documents\\DSA\\Tracer\\kernels.cl'";
 
 };
 

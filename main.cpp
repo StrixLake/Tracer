@@ -5,6 +5,7 @@
 #include <viewport.h>
 #include <schedular.h>
 #include <world.h>
+#include <fmt/ranges.h>
 
 
 int main(){
@@ -19,18 +20,23 @@ int main(){
 
     World world(&resource, &memory);
 
-    world.add_sphere({30, 200, 200, 200, 1, 0.6, 0.5, 0});
-    world.add_sphere({500, 0, 0, 0, 0.5, 0.3, 0.5, 0});
+    world.add_sphere({250, 250, 0, 1000, 0.5, 1, 0.5, 0});
+    world.add_sphere({10000, 0, 0, 0, 1, 0.8, 0.5, 0});
 
     world.to_gpu();
     world.bounce();
 
-    float* d = new float[20];
-    clEnqueueReadBuffer(resource.queue, memory.color, true, 0, 4*20, d, 0, NULL, NULL);
-    for (int i = 0; i < 20; ++i){
-        fmt::print("{0}, ", d[i]);
+    float* d = new float[VRES*VRES*ASPECT_RATIO*3];
+    clEnqueueReadBuffer(resource.queue, memory.color, true, 0, VRES*VRES*ASPECT_RATIO*3*sizeof(float), d, 0, NULL, NULL);
+    int8_t* c = new int8_t[VRES*VRES*ASPECT_RATIO*3];
+    for (int i = 0; i < VRES*VRES*ASPECT_RATIO*3; ++i){
+        c[i] = (int8_t)((d[i] < 0 ? -d[i] : d[i])*255);
+        //fmt::print("{0}, ", d[i]);
     }
-    fmt::print("\n");
+
+
+    stbi_write_bmp("rendered.bmp", VRES*ASPECT_RATIO, VRES, 3, c);
+
 
     return 0;
 }
