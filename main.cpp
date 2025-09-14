@@ -21,6 +21,8 @@ int main(){
     World world(&resource, &memory);
 
     world.add_sphere({250, 250, 0, 1000, 0.5, 1, 0.5, 0});
+    world.add_sphere({250, -250, 0, 1000, 0.5, 0.5, 1, 0});
+    world.add_sphere({25000, 0, 26000, 1400, 1, 0.5, 1, 0});
     world.add_sphere({10000, 0, 0, 0, 1, 0.8, 0.5, 0});
 
     world.to_gpu();
@@ -30,7 +32,7 @@ int main(){
     clEnqueueReadBuffer(resource.queue, memory.color, true, 0, VRES*VRES*ASPECT_RATIO*3*sizeof(float), d, 0, NULL, NULL);
     int8_t* c = new int8_t[VRES*VRES*ASPECT_RATIO*3];
     for (int i = 0; i < VRES*VRES*ASPECT_RATIO*3; ++i){
-        c[i] = (int8_t)((d[i] < 0 ? -d[i] : d[i])*255);
+        c[i] = (int8_t)(d[i]*255);
         //fmt::print("{0}, ", d[i]);
     }
 
