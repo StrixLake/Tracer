@@ -2,7 +2,6 @@
 #include <ios>
 #include <iterator>
 #include <ocl.h>
-#include <string>
 
 
 void compile_kernels(cl_resource* resource){
@@ -16,10 +15,10 @@ void compile_kernels(cl_resource* resource){
     const char* s = source.data();
     size_t t = source.size();
     cl_program program = clCreateProgramWithSource(resource->context, 1, &s, &t, &int_ret);
-    fmt::print("Create program return code: {0}\n", int_ret);
+    HANDLE_ERROR(int_ret, "Create program return code");
 
     int_ret = clBuildProgram(program, 1, (const cl_device_id*)&resource->device, NULL, NULL, NULL);
-    fmt::print("Build program return code: {0}\n", int_ret);
+    HANDLE_ERROR(int_ret, "Build program return code");
     resource->program = program;
 
     return;
@@ -55,13 +54,21 @@ void initialize_resources(cl_resource* resource){
     fmt::print("device has {0} compute units\n", uint_ret);
 
     resource->context = clCreateContext(NULL, 1, &resource->device, NULL, NULL, &int_ret);
-    fmt::print("Context creation return code: {0}\n", int_ret);
+    HANDLE_ERROR(int_ret, "Context creation return code");
 
     compile_kernels(resource);
 
     resource->queue = clCreateCommandQueueWithProperties(resource->context, resource->device, NULL, &int_ret);
-    fmt::print("Command queue creation return code: {0}\n", int_ret);
+    HANDLE_ERROR(int_ret, "Command queue creation return code");
     
     return;
 
+}
+
+void HANDLE_ERROR(int error, std::string name){
+    if (error < 0){
+        fmt::print("{0}: {1}", name, error);
+        exit(1);
+    }
+    return;
 }
