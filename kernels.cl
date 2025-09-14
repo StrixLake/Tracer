@@ -79,6 +79,8 @@ float D(float3 origin, float3 direction, float3 center, float radius){
 // returns the color of the pixel
 float3 lambert(float3 origin, float3 direction, float8 sphere, float intersect);
 
+float3 sRGB(float3 color);
+
 __kernel void intersector(__global float* intersect, __global float* origin, __global float* direction, __global float* color, __global float* spheres, int sphere_count){
     
     int offset = get_offset();
@@ -103,7 +105,7 @@ __kernel void intersector(__global float* intersect, __global float* origin, __g
 
     float3 shade = lambert(origiN, directioN, ball, d_min);
 
-    
+    shade = sRGB(shade);
     
 
     vstore3(shade, offset, color);
@@ -120,12 +122,33 @@ float3 lambert(float3 origin, float3 direction, float8 sphere, float intersect){
     
     // calculate the normal of the sphere on that point
     float3 center = {sphere.s1, sphere.s2, sphere.s3};
-    float3 normal = normalize(center - pointOnSphere);
+    float3 normal = normalize(pointOnSphere - center);
+
+    float3 light_point = {-500, -500, -1};
+    direction = normalize(light_point - pointOnSphere);
+    
     
     // calculate lambert intensity
     float brightness = dot(direction, normal);
+    
     float3 color = {sphere.s4, sphere.s5, sphere.s6};
     color = color*brightness;
     
     return color;
+}
+
+float3 sRGB(float3 color){
+    float3 sColor;
+    sColor.x = 1.055*pow(color.x, (float)(1/2.4)) - 0.055;
+    sColor.y = 1.055*pow(color.y, (float)(1/2.4)) - 0.055;
+    sColor.z = 1.055*pow(color.z, (float)(1/2.4)) - 0.055;
+
+    
+
+    int3 black = color <= 0;
+    if(any(black)){
+        sColor = 0;
+    }
+    
+    return sColor;
 }
