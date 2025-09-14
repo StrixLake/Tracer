@@ -107,11 +107,8 @@ __kernel void intersector(__global float* intersect, __global float* origin, __g
 
     shade = sRGB(shade);
     
-
     vstore3(shade, offset, color);
     
-    
-
     return;
 }
 
@@ -142,13 +139,6 @@ float3 sRGB(float3 color){
     sColor.x = 1.055*pow(color.x, (float)(1/2.4)) - 0.055;
     sColor.y = 1.055*pow(color.y, (float)(1/2.4)) - 0.055;
     sColor.z = 1.055*pow(color.z, (float)(1/2.4)) - 0.055;
-
-    
-
-    int3 black = color <= 0;
-    if(any(black)){
-        sColor = 0;
-    }
     
     return sColor;
 }

@@ -10,6 +10,7 @@
 #include <cl/cl.h>
 #include <fmt/base.h>
 #include <config.h>
+#include <string>
 
 
 
@@ -71,3 +72,5 @@ struct Memory{
 };
 
 void initialize_resources(cl_resource* resource);
+
+void HANDLE_ERROR(int error, std::string name);
