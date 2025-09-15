@@ -7,6 +7,16 @@
 #include <world.h>
 #include <fmt/ranges.h>
 
+float sRGB(float x){
+    float color;
+    if (x <= 0.003){
+        color = 12.93*x;
+    }
+    else{
+        color = 1.055*pow(x, (float)(1/2.4)) - 0.055;
+    }
+    return color;
+}
 
 int main(){
     cl_resource resource;
@@ -30,9 +40,9 @@ int main(){
 
     float* d = new float[VRES*VRES*ASPECT_RATIO*3];
     clEnqueueReadBuffer(resource.queue, memory.color, true, 0, VRES*VRES*ASPECT_RATIO*3*sizeof(float), d, 0, NULL, NULL);
-    int8_t* c = new int8_t[VRES*VRES*ASPECT_RATIO*3];
+    uint8_t* c = new uint8_t[VRES*VRES*ASPECT_RATIO*3];
     for (int i = 0; i < VRES*VRES*ASPECT_RATIO*3; ++i){
-        c[i] = (int8_t)(d[i]*255);
+        c[i] = (uint8_t)(sRGB(d[i])*255);
         //fmt::print("{0}, ", d[i]);
     }
 

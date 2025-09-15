@@ -1,6 +1,13 @@
 #define ASPECT_RATIO 2
 #define VRES 640
 #define APERTURE 100
+#define LIGHT {-500,-500,1}
+
+// takes the origin position, direction and intersect point of the ray with the the sphere
+// returns the color of the pixel
+float3 lambert(float3 origin, float3 direction, float8 sphere, float intersect);
+
+
 
 int get_offset(){
     int block = get_global_id(0);
@@ -75,11 +82,7 @@ float D(float3 origin, float3 direction, float3 center, float radius){
     return distance;
 }
 
-// takes the origin position, direction and intersect point of the ray with the the sphere
-// returns the color of the pixel
-float3 lambert(float3 origin, float3 direction, float8 sphere, float intersect);
 
-float3 sRGB(float3 color);
 
 __kernel void intersector(__global float* intersect, __global float* origin, __global float* direction, __global float* color, __global float* spheres, int sphere_count){
     
@@ -104,8 +107,6 @@ __kernel void intersector(__global float* intersect, __global float* origin, __g
     float8 ball = vload8(off_min, spheres);
 
     float3 shade = lambert(origiN, directioN, ball, d_min);
-
-    shade = sRGB(shade);
     
     vstore3(shade, offset, color);
     
@@ -121,24 +122,16 @@ float3 lambert(float3 origin, float3 direction, float8 sphere, float intersect){
     float3 center = {sphere.s1, sphere.s2, sphere.s3};
     float3 normal = normalize(pointOnSphere - center);
 
-    float3 light_point = {-500, -500, -1};
+    float3 light_point = LIGHT;
     direction = normalize(light_point - pointOnSphere);
     
     
     // calculate lambert intensity
     float brightness = dot(direction, normal);
+    brightness = select(brightness, (float)0, brightness < 0);
     
     float3 color = {sphere.s4, sphere.s5, sphere.s6};
     color = color*brightness;
     
     return color;
-}
-
-float3 sRGB(float3 color){
-    float3 sColor;
-    sColor.x = 1.055*pow(color.x, (float)(1/2.4)) - 0.055;
-    sColor.y = 1.055*pow(color.y, (float)(1/2.4)) - 0.055;
-    sColor.z = 1.055*pow(color.z, (float)(1/2.4)) - 0.055;
-    
-    return sColor;
 }
