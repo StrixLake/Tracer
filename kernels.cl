@@ -3,11 +3,11 @@
 #define APERTURE 100
 #define LIGHT {-500,-500,1}
 
-// takes the origin position, direction and intersect point of the ray with the the sphere
+// takes the point of intersection of the ray with the the sphere
 // returns the color of the pixel
-float3 lambert(float3 origin, float3 direction, float8 sphere, float intersect);
+float3 lambert(float3 pointOnSphere, float8 sphere, float intersect);
 
-
+float shadow(float3 pointOnSphere, __global float* spheres, int sphere_count);
 
 int get_offset(){
     int block = get_global_id(0);
@@ -106,7 +106,10 @@ __kernel void intersector(__global float* intersect, __global float* origin, __g
 
     float8 ball = vload8(off_min, spheres);
 
-    float3 shade = lambert(origiN, directioN, ball, d_min);
+    // store the pointOnSphere too
+    float3 pointOnSphere = origiN + d_min*directioN;
+
+    float3 shade = lambert(pointOnSphere, ball, d_min) * shadow(pointOnSphere, spheres, sphere_count);
     
     vstore3(shade, offset, color);
     
@@ -114,16 +117,14 @@ __kernel void intersector(__global float* intersect, __global float* origin, __g
 }
 
 
-float3 lambert(float3 origin, float3 direction, float8 sphere, float intersect){
-    // calculate the 3d point of intersection
-    float3 pointOnSphere = origin + intersect*direction;
+float3 lambert(float3 pointOnSphere, float8 sphere, float intersect){
     
     // calculate the normal of the sphere on that point
     float3 center = {sphere.s1, sphere.s2, sphere.s3};
     float3 normal = normalize(pointOnSphere - center);
 
     float3 light_point = LIGHT;
-    direction = normalize(light_point - pointOnSphere);
+    float3 direction = normalize(light_point - pointOnSphere);
     
     
     // calculate lambert intensity
@@ -134,4 +135,37 @@ float3 lambert(float3 origin, float3 direction, float8 sphere, float intersect){
     color = color*brightness;
     
     return color;
+}
+
+float shadow(float3 pointOnSphere, __global float* spheres, int sphere_count){
+
+    // get the vector from point on sphere to the light point
+    float3 light = LIGHT;
+    float3 light_vector = normalize(light - pointOnSphere);
+    pointOnSphere += light_vector*(float)0.01;
+
+    // find the closest sphere between point on sphere and light point
+    int off_min = 0;
+    float d_min = INFINITY;
+
+    for (int i = 0; i < sphere_count; ++i){
+        float8 ball = vload8(i, spheres);
+        float3 center = {ball.s1, ball.s2, ball.s3};
+        float new_d = D(pointOnSphere, light_vector, center, ball.s0);
+
+        bool is_new_d_smaller = new_d < d_min;
+        d_min = select(d_min, new_d, is_new_d_smaller);
+        off_min = select(off_min, i, is_new_d_smaller);
+    }
+
+    // get the point at that sphere
+    float3 shadowPoint = pointOnSphere + d_min*light_vector;
+
+    // get the vector from light point to shadow point
+    shadowPoint = shadowPoint - light;
+
+    // get the dot product of shadowPoint and light vector
+    bool in_between = dot(shadowPoint, light_vector) < 0;
+    
+    return select(1, 0, in_between);
 }
