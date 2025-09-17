@@ -7,6 +7,7 @@ class World{
 
     std::vector<float> spheres;
     int sphere_count;
+    int light_count;
     Memory* memory;
     cl_resource* resource;
     
