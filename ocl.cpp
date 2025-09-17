@@ -2,22 +2,50 @@
 #include <ios>
 #include <iterator>
 #include <ocl.h>
+#include <vector>
 
 
 void compile_kernels(cl_resource* resource){
-    std::ifstream f("C:\\Users\\yasha\\Documents\\DSA\\Tracer\\kernels.cl");
-    std::noskipws(f);
-    std::string source(std::istream_iterator<char>(f), {});
-    //fmt::print("{0}\n", source);
+    // load the source code of all kernel files
+    std::ifstream kernel("C:\\Users\\yasha\\Documents\\DSA\\Tracer\\kernels\\kernels.cl");
+    std::noskipws(kernel);
+    std::ifstream viewport("C:\\Users\\yasha\\Documents\\DSA\\Tracer\\kernels\\viewport.cl");
+    std::noskipws(viewport);
+    std::ifstream shader("C:\\Users\\yasha\\Documents\\DSA\\Tracer\\kernels\\shader.cl");
+    std::noskipws(shader);
+    std::ifstream RNG("C:\\Users\\yasha\\Documents\\DSA\\Tracer\\kernels\\RNG.cl");
+    std::noskipws(RNG);
+    std::ifstream intersection("C:\\Users\\yasha\\Documents\\DSA\\Tracer\\kernels\\intersection.cl");
+    std::noskipws(intersection);
+
+    std::string kernelSource(std::istream_iterator<char>(kernel), {});
+    std::string viewportSource(std::istream_iterator<char>(viewport), {});
+    std::string shaderSource(std::istream_iterator<char>(shader), {});
+    std::string RNGSource(std::istream_iterator<char>(RNG), {});
+    std::string intersectionSource(std::istream_iterator<char>(intersection), {});
 
     cl_int int_ret;
     cl_uint uint_ret;
-    const char* s = source.data();
-    size_t t = source.size();
-    cl_program program = clCreateProgramWithSource(resource->context, 1, &s, &t, &int_ret);
+    size_t size_ret;
+    std::vector<const char*> source = {kernelSource.data(), viewportSource.data(), shaderSource.data(), 
+                                        RNGSource.data(), intersectionSource.data()};
+    std::vector<size_t> lengths = {kernelSource.size(),  viewportSource.size(), shaderSource.size(), 
+                                    RNGSource.size(), intersectionSource.size()};
+    
+    cl_program program = clCreateProgramWithSource(resource->context, 5, source.data(), lengths.data(), &int_ret);
     HANDLE_ERROR(int_ret, "Create program return code");
 
-    int_ret = clBuildProgram(program, 1, (const cl_device_id*)&resource->device, NULL, NULL, NULL);
+    int_ret = clBuildProgram(program, 1, (const cl_device_id*)&resource->device, Kernels::compile_options, NULL, NULL);
+
+    if (int_ret != 0){
+        // get build log
+        clGetProgramBuildInfo(program, resource->device, CL_PROGRAM_BUILD_LOG, 0, NULL, &size_ret);
+        std::string log;
+        log.resize(size_ret);
+        clGetProgramBuildInfo(program, resource->device, CL_PROGRAM_BUILD_LOG, size_ret, log.data(), &size_ret);
+        fmt::print("Build Log:\n{0}\n", log);
+    }
+
     HANDLE_ERROR(int_ret, "Build program return code");
     resource->program = program;
 
