@@ -11,7 +11,7 @@ World::World(cl_resource* resource, Memory* memory){
 void World::add_sphere(std::vector<float> sphere){
     this->sphere_count += 1;
     
-    if(sphere[7] == 1) this->light_count += 1;
+    if(sphere[7] != 0) this->light_count += 1;
 
     for(int i = 0; i < sphere.size(); ++i){
         this->spheres.push_back(sphere[i]);

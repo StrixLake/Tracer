@@ -93,8 +93,6 @@ float3 softShadow(float3 pointOnSphere, float8 ball, __global float* spheres, in
 
             shade += ball.s456*brightness*light_ball.s7;
 
-            
-
         }
     }
     return shade/(NSAMPLE*lights_count);
