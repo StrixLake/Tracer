@@ -22,7 +22,7 @@ void nearest_sphere(float3 origin, float3 direction, __global float* spheres, in
 float D(float3 origin, float3 direction, float3 center, float radius);
 
 // give a random floating point number between 0 and 1;
-float xorshift(uint state);
+float xorshift(uint* state);
 
 // populates the ligth array of size 3*SAMPLE with
 // random light points around a unit sphere
