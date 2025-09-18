@@ -34,6 +34,10 @@ void randomLight(float* light);
 // it is assumed that the light spheres are the first on the list
 float3 softShadow(float3 pointOnSphere, float8 ball, __global float* spheres, int sphere_count, int lights_count);
 
+// takes the rayOrigin and rayDirection of the ray that is to be reflected
+// and ball and d_min from the ball the ray is to be reflected
+void reflection(float3* rayOrigin, float3* rayDirection, float3 pointOnSphere, float8 ball, float d_min);
+
 int get_offset(){
     int block = get_global_id(0);
     int y = get_global_id(1);

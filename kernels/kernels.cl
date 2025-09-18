@@ -18,11 +18,33 @@ __kernel void render(__global float* intersect, __global float* originArray, __g
     nearest_sphere(rayOrigin, rayDirection, spheres, sphere_count, &off_min, &d_min);
 
     float8 ball = vload8(off_min, spheres);
+    // early exit if the sphere hit is light sphere
+    if(ball.s7 != 0){
+        vstore3(ball.s456, offset, color);
+        return;
+    }
 
     // store the pointOnSphere too
     float3 pointOnSphere = rayOrigin + d_min*rayDirection;
-
+    
     float3 shade = softShadow(pointOnSphere, ball, spheres, sphere_count, light_count);
+
+    // reflect the ray
+    reflection(&rayOrigin, &rayDirection, pointOnSphere, ball, d_min);
+    // get the new nearest sphere
+    nearest_sphere(rayOrigin, rayDirection, spheres, sphere_count, &off_min, &d_min);
+    // load the next ball
+    ball = vload8(off_min, spheres);
+    // get the new pointOnSphere
+    pointOnSphere = rayOrigin + d_min*rayDirection;
+
+    // early exit if the sphere hit in reflection is a light sphere
+    if(ball.s7 != 0){
+        vstore3((float)0.5*ball.s456 + (float)0.5*shade, offset, color);
+        return;
+    }
+    
+    shade = (float)0.5*softShadow(pointOnSphere, ball, spheres, sphere_count, light_count) + (float)0.5*shade;
     
     vstore3(shade, offset, color);
     
