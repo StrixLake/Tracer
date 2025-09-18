@@ -30,11 +30,11 @@ int main(){
 
     World world(&resource, &memory);
 
-    world.add_sphere({250, -500, -500, -1000, 0.5, 1, 0.5, 1});
+    world.add_sphere({500, -1000, -1000, -100, 0.5, 1, 0.5, 1});
+    world.add_sphere({10000, 0, 0, 0, 1, 0.8, 0.5, 0});
     world.add_sphere({250, 250, 0, 1000, 0.5, 1, 0.5, 0});
     world.add_sphere({250, -250, 0, 1000, 0.5, 0.5, 1, 0});
     world.add_sphere({25000, 0, 26000, 1400, 1, 0.5, 1, 0});
-    world.add_sphere({10000, 0, 0, 0, 1, 0.8, 0.5, 0});
 
     world.to_gpu();
     world.bounce();

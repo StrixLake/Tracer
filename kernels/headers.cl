@@ -4,6 +4,7 @@
 #define ASPECT_RATIO 2
 #define VRES 640
 #define APERTURE 100
+#define NSAMPLE 200
 #define LIGHT {-500,-500,1}
 
 // takes the point of intersection of the ray with the the sphere
@@ -15,11 +16,23 @@ float shadow(float3 pointOnSphere, __global float* spheres, int sphere_count);
 
 // takes the ray direction & origin and the array of spheres
 // and returns the d_min and offset of the nearest sphere
-void nearest_sphere(float3 origin, float3 direction, __global float* spheres, int sphere_count, int* off_minO, float* d_minO);
+void nearest_sphere(float3 origin, float3 direction, __global float* spheres, int sphere_count, int* off_min, float* d_min);
 
+// gives the distance a ray and a sphere of radius
 float D(float3 origin, float3 direction, float3 center, float radius);
 
-float xorshift(int state);
+// give a random floating point number between 0 and 1;
+float xorshift(uint state);
+
+// populates the ligth array of size 3*SAMPLE with
+// random light points around a unit sphere
+void randomLight(float* light);
+
+// takes the pointOnSphere (the sphere that is visible to viewport), the center of that sphere,
+// and a list of
+// all spheres, and calculate the soft shadow on that point
+// it is assumed that the light spheres are the first on the list
+float3 softShadow(float3 pointOnSphere, float8 ball, __global float* spheres, int sphere_count, int lights_count);
 
 int get_offset(){
     int block = get_global_id(0);

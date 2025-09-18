@@ -22,7 +22,7 @@ __kernel void render(__global float* intersect, __global float* originArray, __g
     // store the pointOnSphere too
     float3 pointOnSphere = rayOrigin + d_min*rayDirection;
 
-    float3 shade = lambert(pointOnSphere, ball, d_min) * shadow(pointOnSphere, spheres, sphere_count);
+    float3 shade = softShadow(pointOnSphere, ball, spheres, sphere_count, light_count);
     
     vstore3(shade, offset, color);
     

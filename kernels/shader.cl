@@ -28,18 +28,11 @@ float shadow(float3 pointOnSphere, __global float* spheres, int sphere_count){
     pointOnSphere += light_vector*(float)0.01;
 
     // find the closest sphere between point on sphere and light point
-    int off_min = 0;
-    float d_min = INFINITY;
+    int off_min;
+    float d_min;
 
-    for (int i = 0; i < sphere_count; ++i){
-        float8 ball = vload8(i, spheres);
-        float3 center = {ball.s1, ball.s2, ball.s3};
-        float new_d = D(pointOnSphere, light_vector, center, ball.s0);
-
-        bool is_new_d_smaller = new_d < d_min;
-        d_min = select(d_min, new_d, is_new_d_smaller);
-        off_min = select(off_min, i, is_new_d_smaller);
-    }
+    // get the nearest sphere in the light vector direction
+    nearest_sphere(pointOnSphere, light_vector, spheres, sphere_count, &off_min, &d_min);
 
     // get the point at that sphere
     float3 shadowPoint = pointOnSphere + d_min*light_vector;
@@ -51,4 +44,58 @@ float shadow(float3 pointOnSphere, __global float* spheres, int sphere_count){
     bool in_between = dot(shadowPoint, light_vector) < 0;
     
     return select(1, 0, in_between);
+}
+
+
+// takes the pointOnSphere (the sphere that is visible to viewport), the sphere itself,
+// and a list of
+// all spheres, and calculate the soft shadow on that point
+// it is assumed that the light spheres are the first on the list
+float3 softShadow(float3 pointOnSphere, float8 ball, __global float* spheres, int sphere_count, int lights_count){
+    float3 shade = 0;
+
+    // get normal from center to pointOnSphere
+    float3 normal = normalize(pointOnSphere - ball.s123);
+
+    float lights[3*NSAMPLE];
+
+    // initialize the random points between [0,1]
+    randomLight(lights);
+    
+
+    for(int i = 0; i < lights_count; ++i){
+        float8 light_sphere = vload8(i, spheres);
+        // for every light sphere, find the nearest sphere
+        // from the pointOnSphere in the direction of that random point
+        for (int j = 0; j < NSAMPLE; ++j){
+            float3 randomPoint = vload3(j, lights);
+            // scale the point
+            randomPoint = randomPoint*light_sphere.s0;
+            randomPoint += light_sphere.s123;
+
+            // get the light vector
+            randomPoint = normalize(randomPoint - pointOnSphere);
+            // push pointOnSphere slightly towards randomPoint
+            pointOnSphere += randomPoint*(float)0.1;
+            // we already know that the pointOnSphere will
+            // intersect any sphere in the direction of random point
+            // so we will take the lamber color ahead of time anyway
+
+            float brightness = dot(randomPoint, normal);
+            brightness = select(brightness, (float)0, brightness < 0);
+
+            
+            int off_min;
+            float d_min;
+            nearest_sphere(pointOnSphere, randomPoint, spheres, sphere_count, &off_min, &d_min);
+
+            float8 light_ball = vload8(off_min, spheres);
+
+            shade += ball.s456*brightness*light_ball.s7;
+
+            
+
+        }
+    }
+    return shade/(NSAMPLE*lights_count);
 }
