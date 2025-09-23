@@ -57,10 +57,11 @@ float3 softShadow(float3 pointOnSphere, float8 ball, __global float* spheres, in
     // get normal from center to pointOnSphere
     float3 normal = normalize(pointOnSphere - ball.s123);
 
-    float lights[3*NSAMPLE];
+    //float lights[3*NSAMPLE];
 
     // initialize the random points between [0,1]
-    randomLight(lights);
+    //randomLight(lights);
+    uint seed = 2*get_offset()+1;
     
 
     for(int i = 0; i < lights_count; ++i){
@@ -68,7 +69,10 @@ float3 softShadow(float3 pointOnSphere, float8 ball, __global float* spheres, in
         // for every light sphere, find the nearest sphere
         // from the pointOnSphere in the direction of that random point
         for (int j = 0; j < NSAMPLE; ++j){
-            float3 randomPoint = vload3(j, lights);
+            float3 randomPoint;
+            randomPoint.x = xorshift(&seed);
+            randomPoint.y = xorshift(&seed);
+            randomPoint.z = xorshift(&seed);
             // scale the point
             randomPoint = randomPoint*light_sphere.s0;
             randomPoint += light_sphere.s123;
@@ -91,7 +95,7 @@ float3 softShadow(float3 pointOnSphere, float8 ball, __global float* spheres, in
 
             float8 light_ball = vload8(off_min, spheres);
 
-            shade += ball.s456*brightness*light_ball.s7;
+            shade += ball.s456*brightness*light_ball.s7*light_ball.s456;
 
         }
     }

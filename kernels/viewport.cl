@@ -23,7 +23,7 @@ __kernel void viewport(__global float* intersect, __global float* origin, __glob
     pixelx = pixelx - (VRES*ASPECT_RATIO/2);
     pixely = pixely - (VRES/2);
     
-    float3 pixel = {pixelx, pixely, focal_length};
+    float3 pixel = {pixelx*FOV, pixely*FOV, focal_length};
 
     float3 normal = normalize(pixel);
 

@@ -22,17 +22,17 @@ void World::add_sphere(std::vector<float> sphere){
 void World::to_gpu(){
     cl_int int_ret;
     memory->spheres = clCreateBuffer(resource->context, CL_MEM_READ_WRITE, this->sphere_count * 8 * sizeof(float), NULL, &int_ret);
-    fmt::print("to_gpu create buffer for spheres return code: {0}\n", int_ret);
+    HANDLE_ERROR(int_ret, "to_gpu create buffer for spheres return code");
 
     int_ret = clEnqueueWriteBuffer(resource->queue, memory->spheres, true, 0, this->sphere_count * 8 * sizeof(float), this->spheres.data(), 0, NULL, NULL);
-    fmt::print("to_gpu buffer write return code: {0}\n", int_ret);
+    HANDLE_ERROR(int_ret, "to_gpu buffer write return code");
     return;
 }
 
 void World::bounce(){
     cl_int int_ret;
     cl_kernel kernel = clCreateKernel(resource->program, Kernels::render, &int_ret);
-    fmt::print("intersector kernel creation return code: {0}\n", int_ret);
+    HANDLE_ERROR(int_ret, "Render kernel creation return code");
 
     clSetKernelArg(kernel, 0, sizeof(cl_mem), &memory->intersect);
     clSetKernelArg(kernel, 1, sizeof(cl_mem), &memory->origin);

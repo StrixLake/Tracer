@@ -46,9 +46,11 @@ void nearest_sphere(float3 origin, float3 direction, __global float* spheres, in
 }
 
 
-void reflection(float3* rayOrigin, float3* rayDirection, float3 pointOnSphere, float8 ball, float d_min){
+void reflection(float3* rayOrigin, float3* rayDirection, float3 pointOnSphere, float8 ball, float d_min, float* reflection_coeff){
     float3 normal = normalize(pointOnSphere - ball.s123);
-    *rayOrigin = *rayOrigin + (d_min-(float)0.1)*(*rayDirection);
-    *rayDirection = normalize(*rayDirection - 2*dot(normal, *rayDirection)*normal);
-    
+    *rayOrigin = *rayOrigin + (d_min-(float)(0.00001*ball.s0 + 0.1))*(*rayDirection);
+    float3 incident_ray = *rayDirection;
+    *rayDirection = *rayDirection - 2*dot(normal, *rayDirection)*normal;
+    // calculate the schlicks approximation
+    //*reflection_coeff = *reflection_coeff + (1 - *reflection_coeff)*pow((1 + dot(incident_ray, *rayDirection)), 5);
 }
