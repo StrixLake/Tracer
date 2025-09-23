@@ -6,6 +6,8 @@
 #include <schedular.h>
 #include <world.h>
 #include <fmt/ranges.h>
+#include <fmt/chrono.h>
+#include <chrono>
 
 float sRGB(float x){
     float color;
@@ -25,20 +27,33 @@ int main(){
     cl_int int_ret;
     size_t size_ret;
 
+    
     Memory memory(&resource);
     create_viewport(&resource, &memory);
-
+    
     World world(&resource, &memory);
+    
+    world.add_sphere({250, -1000, -1000, 100, 1, 1, 1, 1});
 
-    world.add_sphere({250, -1000, -1000, -100, 1, 1, 1, 1});
-    //world.add_sphere({400, 1000, -1000, -100, 0.5, 1, 0.5, 1});
-    world.add_sphere({250, 250, 0, 1000, 0.5, 1, 0.5, 0});
+    world.add_sphere({250, 250, 75, 2000, 0.5, 1, 0.5, 0.3});
+    world.add_sphere({100, 250, 225, 1200, 0.3, 0.7, 1, 0});
+
+    world.add_sphere({250, -250, 75, 2000, 0.5, 0.5, 1, 0});
+    world.add_sphere({50, -500, 275, 1400, 0.4, 0.1, 0.8, 0});
     world.add_sphere({10000, 0, 0, 0, 1, 0.8, 0.5, 0});
-    world.add_sphere({250, -250, 0, 1000, 0.5, 0.5, 1, 0});
-    world.add_sphere({25000, 0, 26000, 1400, 1, 0.5, 1, 0});
-
+    world.add_sphere({3500000, 0, 3500000+325, 6000, 1, 1, 1, 0});
+    
     world.to_gpu();
+    
+    const std::chrono::time_point<std::chrono::high_resolution_clock> t1 = std::chrono::high_resolution_clock::now();
+    
     world.bounce();
+    
+    const std::chrono::time_point<std::chrono::high_resolution_clock> t2 = std::chrono::high_resolution_clock::now();
+    
+    std::chrono::duration<double> render_time = t2 - t1;
+
+    fmt::print("render time: {0}\n", render_time);
 
     float* d = new float[VRES*VRES*ASPECT_RATIO*3];
     clEnqueueReadBuffer(resource.queue, memory.color, true, 0, VRES*VRES*ASPECT_RATIO*3*sizeof(float), d, 0, NULL, NULL);

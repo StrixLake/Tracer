@@ -2,9 +2,9 @@
 #define HEADER
 
 #define ASPECT_RATIO 2
-#define VRES 640
-#define APERTURE 100
-#define NSAMPLE 200
+#define VRES 1280
+#define FOV 0.5
+#define NSAMPLE 1000
 #define LIGHT {-500,-500,1}
 
 // takes the point of intersection of the ray with the the sphere
@@ -21,7 +21,7 @@ void nearest_sphere(float3 origin, float3 direction, __global float* spheres, in
 // gives the distance a ray and a sphere of radius
 float D(float3 origin, float3 direction, float3 center, float radius);
 
-// give a random floating point number between 0 and 1;
+// gives a random floating point number between 0 and 1;
 float xorshift(uint* state);
 
 // populates the ligth array of size 3*SAMPLE with
@@ -36,7 +36,7 @@ float3 softShadow(float3 pointOnSphere, float8 ball, __global float* spheres, in
 
 // takes the rayOrigin and rayDirection of the ray that is to be reflected
 // and ball and d_min from the ball the ray is to be reflected
-void reflection(float3* rayOrigin, float3* rayDirection, float3 pointOnSphere, float8 ball, float d_min);
+void reflection(float3* rayOrigin, float3* rayDirection, float3 pointOnSphere, float8 ball, float d_min, float* reflection_coeff);
 
 int get_offset(){
     int block = get_global_id(0);

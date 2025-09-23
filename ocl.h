@@ -13,6 +13,7 @@
 #include <string>
 
 
+void HANDLE_ERROR(int error, std::string name);
 
 struct cl_resource{
     cl_platform_id platform;
@@ -37,7 +38,7 @@ struct Kernels{
     static constexpr char intersector[] = "intersector";
     static constexpr char render[] = "render";
 
-    static constexpr char compile_options[] = "-I C:\\Users\\yasha\\Documents\\DSA\\Tracer\\kernels\\";
+    static constexpr char compile_options[] = "-I C:\\Users\\yasha\\Documents\\DSA\\Tracer\\kernels\\ -cl-fast-relaxed-math";
 
 };
 
@@ -46,13 +47,13 @@ struct Memory{
     Memory(cl_resource* resource){
         cl_int int_ret;
         intersect = clCreateBuffer(resource->context, CL_MEM_READ_WRITE, VRES*VRES*ASPECT_RATIO*sizeof(float), NULL, &int_ret);
-        fmt::print("Intersect matrix allocation return code: {0}\n", int_ret);
+        HANDLE_ERROR(int_ret, "Intersect matrix allocation return code");
         origin = clCreateBuffer(resource->context, CL_MEM_READ_WRITE, VRES*VRES*ASPECT_RATIO*3*sizeof(float), NULL, &int_ret);
-        fmt::print("Origin matrix allocation return code: {0}\n", int_ret);
+        HANDLE_ERROR(int_ret, "Origin matrix allocation return code");
         direction = clCreateBuffer(resource->context, CL_MEM_READ_WRITE, VRES*VRES*ASPECT_RATIO*3*sizeof(float), NULL, &int_ret);
-        fmt::print("Direction matrix allocation return code: {0}\n", int_ret);
+        HANDLE_ERROR(int_ret, "Direction matrix allocation return code");
         color = clCreateBuffer(resource->context, CL_MEM_READ_WRITE, VRES*VRES*ASPECT_RATIO*3*sizeof(float), NULL, &int_ret);
-        fmt::print("Color matrix allocation return code: {0}\n", int_ret);
+        HANDLE_ERROR(int_ret, "Color matrix allocation return code");
         return;
     }
 
@@ -74,5 +75,3 @@ struct Memory{
 };
 
 void initialize_resources(cl_resource* resource);
-
-void HANDLE_ERROR(int error, std::string name);
