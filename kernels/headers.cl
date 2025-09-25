@@ -4,7 +4,7 @@
 #define ASPECT_RATIO 2
 #define VRES 1280
 #define FOV 0.5
-#define NSAMPLE 1000
+#define NSAMPLE 200
 #define LIGHT {-500,-500,1}
 
 // takes the point of intersection of the ray with the the sphere
@@ -32,11 +32,15 @@ void randomLight(float* light);
 // and a list of
 // all spheres, and calculate the soft shadow on that point
 // it is assumed that the light spheres are the first on the list
-float3 softShadow(float3 pointOnSphere, float8 ball, __global float* spheres, int sphere_count, int lights_count);
+float3 softShadow(float3 pointOnSphere, float4 ball, float4 ballColor, __global float* rSpheres, __global float* cSpheres, int sphere_count, int lights_count);
 
 // takes the rayOrigin and rayDirection of the ray that is to be reflected
 // and ball and d_min from the ball the ray is to be reflected
-void reflection(float3* rayOrigin, float3* rayDirection, float3 pointOnSphere, float8 ball, float d_min, float* reflection_coeff);
+void reflection(float3* rayOrigin, float3* rayDirection, float3 pointOnSphere, float4 ball, float d_min, float* reflection_coeff);
+
+// takes all the same params as reflection and changes the direction and origin of the ray
+// after it refracts and exits from the transparent sphere
+void refraction(float3* rayOrigin, float3* rayDirection, float3 pointOnSphere, float4 ball, float d_min, float refractive_index);
 
 int get_offset(){
     int block = get_global_id(0);

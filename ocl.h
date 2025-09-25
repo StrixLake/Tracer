@@ -46,8 +46,6 @@ struct Memory{
 
     Memory(cl_resource* resource){
         cl_int int_ret;
-        intersect = clCreateBuffer(resource->context, CL_MEM_READ_WRITE, VRES*VRES*ASPECT_RATIO*sizeof(float), NULL, &int_ret);
-        HANDLE_ERROR(int_ret, "Intersect matrix allocation return code");
         origin = clCreateBuffer(resource->context, CL_MEM_READ_WRITE, VRES*VRES*ASPECT_RATIO*3*sizeof(float), NULL, &int_ret);
         HANDLE_ERROR(int_ret, "Origin matrix allocation return code");
         direction = clCreateBuffer(resource->context, CL_MEM_READ_WRITE, VRES*VRES*ASPECT_RATIO*3*sizeof(float), NULL, &int_ret);
@@ -59,17 +57,21 @@ struct Memory{
 
     cl_mem origin;
     cl_mem direction;
-    cl_mem intersect;
     cl_mem color;
-    cl_mem spheres;
+    // sphere position, color and properties array
+    cl_mem rSpheres;
+    cl_mem cSpheres;
+    cl_mem pSpheres;
+    
 
     ~Memory(){
         fmt::print("Dealocating memory from device\n");
         clReleaseMemObject(origin);
         clReleaseMemObject(direction);
-        clReleaseMemObject(intersect);
         clReleaseMemObject(color);
-        clReleaseMemObject(spheres);
+        clReleaseMemObject(rSpheres);
+        clReleaseMemObject(cSpheres);
+        clReleaseMemObject(pSpheres);
         return;
     }
 };

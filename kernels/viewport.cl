@@ -2,18 +2,13 @@
 
 // initializes the viewport with the appropriate
 // origin and direction of each ray for the pixel
-__kernel void viewport(__global float* intersect, __global float* origin, __global float* direction, __global float* color, float focal_length){
+__kernel void viewport(__global float* origin, __global float* direction, __global float* color, float focal_length){
    
     int offset = get_offset();
-    int rbgOffset = 3*offset;
+
+    vstore3(0, offset, color);
 
     // focal length is in the z direction
-
-    color[rbgOffset] = 0;
-    color[rbgOffset+1] = 0;
-    color[rbgOffset+2] = 0;
-
-    intersect[offset] = 0;
 
     // get the (x,y) form of the pixel from offset
     int pixelx = offset % (VRES*ASPECT_RATIO);
