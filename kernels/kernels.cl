@@ -1,52 +1,55 @@
 #include "headers.cl"
 
 
-__kernel void render(__global float* intersect, __global float* originArray, __global float* directionArray,
-                          __global float* color, __global float* spheres, int sphere_count, int light_count){
+__kernel void render(__global float* raysOrigin, __global float* raysDirection,
+                     __global float* color, __global float* rSpheres, __global float* cSphere, __global float* pSphere,
+                     int sphere_count, int light_count){
     
     int offset = get_offset();
     
     // load the direction and origin of the ray
     // for the current pixel
-    float3 rayDirection = vload3(offset, directionArray);
-    float3 rayOrigin = vload3(offset, originArray);
+    float3 rayDirection = vload3(offset, raysDirection);
+    float3 rayOrigin = vload3(offset, raysOrigin);
 
     int off_min;
     float d_min;
 
     // get the nearest sphere ray intersects with
-    nearest_sphere(rayOrigin, rayDirection, spheres, sphere_count, &off_min, &d_min);
+    nearest_sphere(rayOrigin, rayDirection, rSpheres, sphere_count, &off_min, &d_min);
 
-    float8 ball = vload8(off_min, spheres);
+    float4 ball = vload4(off_min, rSpheres);
+    float4 ballColor = vload4(off_min, cSphere);
     // early exit if the sphere hit is light sphere
-    if(ball.s7 != 0){
-        vstore3(ball.s456, offset, color);
+    if(ballColor.s3 != 0){
+        vstore3(ballColor.s012, offset, color);
         return;
     }
 
     // store the pointOnSphere too
     float3 pointOnSphere = rayOrigin + d_min*rayDirection;
     
-    float3 shade = softShadow(pointOnSphere, ball, spheres, sphere_count, light_count);
+    float3 shade = softShadow(pointOnSphere, ball, ballColor, rSpheres, cSphere, sphere_count, light_count);
 
     float reflection_coff = 0.3;
 
     // reflect the ray
     reflection(&rayOrigin, &rayDirection, pointOnSphere, ball, d_min, &reflection_coff);
     // get the new nearest sphere
-    nearest_sphere(rayOrigin, rayDirection, spheres, sphere_count, &off_min, &d_min);
+    nearest_sphere(rayOrigin, rayDirection, rSpheres, sphere_count, &off_min, &d_min);
     // load the next ball
-    ball = vload8(off_min, spheres);
+    ball = vload4(off_min, rSpheres);
+    ballColor = vload4(off_min, cSphere);
     // get the new pointOnSphere
     pointOnSphere = rayOrigin + d_min*rayDirection;
 
     // early exit if the sphere hit in reflection is a light sphere
-    if(ball.s7 != 0){
-        vstore3(reflection_coff*ball.s456 + (1-reflection_coff)*shade, offset, color);
+    if(ballColor.s3 != 0){
+        vstore3(reflection_coff*ballColor.s012 + (1-reflection_coff)*shade, offset, color);
         return;
     }
     
-    shade = reflection_coff*softShadow(pointOnSphere, ball, spheres, sphere_count, light_count) + (1-reflection_coff)*shade;
+    shade = reflection_coff*softShadow(pointOnSphere, ball, ballColor, rSpheres, cSphere, sphere_count, light_count) + (1-reflection_coff)*shade;
     
     vstore3(shade, offset, color);
     

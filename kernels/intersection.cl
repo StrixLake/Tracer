@@ -30,7 +30,7 @@ void nearest_sphere(float3 origin, float3 direction, __global float* spheres, in
     float distance = INFINITY;
 
     for (int i = 0; i < sphere_count; ++i){
-        float8 ball = vload8(i, spheres);
+        float4 ball = vload4(i, spheres);
         float3 center = {ball.s1, ball.s2, ball.s3};
         float new_d = D(origin, direction, center, ball.s0);
 
@@ -46,9 +46,9 @@ void nearest_sphere(float3 origin, float3 direction, __global float* spheres, in
 }
 
 
-void reflection(float3* rayOrigin, float3* rayDirection, float3 pointOnSphere, float8 ball, float d_min, float* reflection_coeff){
+void reflection(float3* rayOrigin, float3* rayDirection, float3 pointOnSphere, float4 ball, float d_min, float* reflection_coeff){
     float3 normal = normalize(pointOnSphere - ball.s123);
-    *rayOrigin = *rayOrigin + (d_min-(float)(0.00001*ball.s0 + 0.1))*(*rayDirection);
+    *rayOrigin = *rayOrigin + (d_min-(0.00001f*ball.s0 + 0.1f))*(*rayDirection);
     float3 incident_ray = *rayDirection;
     *rayDirection = *rayDirection - 2*dot(normal, *rayDirection)*normal;
     // calculate the schlicks approximation
