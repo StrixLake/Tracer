@@ -33,20 +33,20 @@ int main(){
     
     World world(&resource, &memory);
 
-    // white sphere behind the camera
-    world.add_sphere({250, -1000, -1000, 100}, {1, 1, 1, 1}, {0, 0, 0, 0});
     // green sphere
-    world.add_sphere({250, 250, 75, 2000}, {0.5, 1, 0.5, 0.5}, {0, 0, 0, 0});
+    world.add_sphere({250, 250, 75, 2000}, {0.5, 1, 0.5, 1}, {0, 0, 0, 0});
+    // white sphere behind the camera
+    world.add_sphere({250, -1000, -1000, 100}, {1, 1, 1, 0}, {0.3, 0, 0, 0});
     // blue sphere besides the green sphere
-    world.add_sphere({250, -250, 75, 2000}, {0.5, 0.5, 1, 0}, {0, 0, 0, 0});
+    world.add_sphere({250, -250, 75, 2000}, {0.5, 0.5, 1, 0}, {0.5, 0, 0, 0});
     // small purple sphere on the left
-    world.add_sphere({50, -500, 280, 1400}, {0.4, 0.1, 0.8, 0}, {0, 0, 0, 0});
+    world.add_sphere({50, -500, 280, 1400}, {0.4, 0.1, 0.8, 0}, {0.3, 0, 0, 0});
     // small blue on the right
-    world.add_sphere({100, 250, 230, 1200}, {0.3, 0.7, 1, 0}, {0, 0, 0, 0});
+    world.add_sphere({100, 250, 230, 1200}, {0.3, 0.7, 1, 0}, {0.2, 0, 0, 0});
     // world sphere
     world.add_sphere({10000, 0, 0, 0}, {1, 0.8, 0.5, 0}, {0, 0, 0, 0});
     // floor sphere
-    world.add_sphere({3500000, 0, 3500000+325, 6000}, {1, 1, 1, 0}, {0, 0, 0, 0});
+    world.add_sphere({3500000, 0, 3500000+325, 6000}, {1, 1, 1, 0}, {0.9, 0, 0, 0});
     
     world.to_gpu();
     
