@@ -4,7 +4,7 @@
 #define ASPECT_RATIO 2
 #define VRES 1280
 #define FOV 0.5
-#define NSAMPLE 200
+#define NSAMPLE 10000
 #define LIGHT {-500,-500,1}
 
 // takes the point of intersection of the ray with the the sphere

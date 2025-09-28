@@ -31,7 +31,14 @@ __kernel void render(__global float* raysOrigin, __global float* raysDirection,
     
     float3 shade = softShadow(pointOnSphere, ball, ballColor, rSpheres, cSphere, sphere_count, light_count);
 
-    float reflection_coff = 0.3;
+    float4 ballProp = vload4(off_min, pSphere);
+    float reflection_coff = ballProp.s0;
+
+    // early exit if reflectivity is 0
+    if (reflection_coff == 0) {
+        vstore3(shade, offset, color);
+        return;
+    }
 
     // reflect the ray
     reflection(&rayOrigin, &rayDirection, pointOnSphere, ball, d_min, &reflection_coff);
