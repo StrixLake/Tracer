@@ -7,15 +7,15 @@
 
 void compile_kernels(cl_resource* resource){
     // load the source code of all kernel files
-    std::ifstream kernel("C:\\Users\\yasha\\Documents\\DSA\\Tracer\\kernels\\kernels.cl");
+    std::ifstream kernel("C:\\Users\\yasha\\Documents\\Projects\\Tracer\\kernels\\kernels.cl");
     std::noskipws(kernel);
-    std::ifstream viewport("C:\\Users\\yasha\\Documents\\DSA\\Tracer\\kernels\\viewport.cl");
+    std::ifstream viewport("C:\\Users\\yasha\\Documents\\Projects\\Tracer\\kernels\\viewport.cl");
     std::noskipws(viewport);
-    std::ifstream shader("C:\\Users\\yasha\\Documents\\DSA\\Tracer\\kernels\\shader.cl");
+    std::ifstream shader("C:\\Users\\yasha\\Documents\\Projects\\Tracer\\kernels\\shader.cl");
     std::noskipws(shader);
-    std::ifstream RNG("C:\\Users\\yasha\\Documents\\DSA\\Tracer\\kernels\\RNG.cl");
+    std::ifstream RNG("C:\\Users\\yasha\\Documents\\Projects\\Tracer\\kernels\\RNG.cl");
     std::noskipws(RNG);
-    std::ifstream intersection("C:\\Users\\yasha\\Documents\\DSA\\Tracer\\kernels\\intersection.cl");
+    std::ifstream intersection("C:\\Users\\yasha\\Documents\\Projects\\Tracer\\kernels\\intersection.cl");
     std::noskipws(intersection);
 
     std::string kernelSource(std::istream_iterator<char>(kernel), {});

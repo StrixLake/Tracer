@@ -68,6 +68,7 @@ float3 softShadow(float3 pointOnSphere, float4 ball, float4 ballColor, __global 
         float4 light_sphere = vload4(i, rSpheres);
         // for every light sphere, find the nearest sphere
         // from the pointOnSphere in the direction of that random point
+        float3 tempshade = 0;
         for (int j = 0; j < NSAMPLE; ++j){
             float3 randomPoint;
             randomPoint.x = xorshift(&seed);
@@ -95,9 +96,14 @@ float3 softShadow(float3 pointOnSphere, float4 ball, float4 ballColor, __global 
 
             float4 light_ball = vload4(off_min, cSpheres);
 
-            shade += ballColor.s012*brightness*light_ball.s3*light_ball.s012;
+            tempshade += ballColor.s012*brightness*light_ball.s3*light_ball.s012;
 
         }
+        // scale the light received by light sphere and
+        // then add it to the total light
+        float lth = length(pointOnSphere - light_sphere.s123) - light_sphere.s0/1.7f;
+        shade += tempshade * ((light_sphere.s0 * light_sphere.s0)/(2*lth*lth));
+
     }
     return shade/(NSAMPLE*lights_count);
 }

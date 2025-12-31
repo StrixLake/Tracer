@@ -38,7 +38,7 @@ struct Kernels{
     static constexpr char intersector[] = "intersector";
     static constexpr char render[] = "render";
 
-    static constexpr char compile_options[] = "-I C:\\Users\\yasha\\Documents\\DSA\\Tracer\\kernels\\ -cl-fast-relaxed-math";
+    static constexpr char compile_options[] = "-I C:\\Users\\yasha\\Documents\\Projects\\Tracer\\kernels\\ -cl-fast-relaxed-math";
 
 };
 

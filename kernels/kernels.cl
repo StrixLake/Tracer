@@ -22,7 +22,7 @@ __kernel void render(__global float* raysOrigin, __global float* raysDirection,
     float4 ballColor = vload4(off_min, cSphere);
     // early exit if the sphere hit is light sphere
     if(ballColor.s3 != 0){
-        vstore3(ballColor.s012, offset, color);
+        vstore3(ballColor.s012*ballColor.s3, offset, color);
         return;
     }
 
@@ -52,7 +52,7 @@ __kernel void render(__global float* raysOrigin, __global float* raysDirection,
 
     // early exit if the sphere hit in reflection is a light sphere
     if(ballColor.s3 != 0){
-        vstore3(reflection_coff*ballColor.s012 + (1-reflection_coff)*shade, offset, color);
+        vstore3(reflection_coff*ballColor.s012*ballColor.s3 + (1-reflection_coff)*shade, offset, color);
         return;
     }
     
