@@ -1,5 +1,7 @@
 #include "headers.cl"
 
+
+
 float3 lambert(float3 pointOnSphere, float8 sphere, float intersect){
     
     // calculate the normal of the sphere on that point
@@ -87,7 +89,7 @@ float3 softShadow(float3 pointOnSphere, float4 ball, float4 ballColor, __global 
             // so we will take the lamber color ahead of time anyway
 
             float brightness = dot(randomPoint, normal);
-            brightness = select(brightness, 0.f, brightness < 0);
+            if (brightness < 0) brightness = 0;
 
             
             int off_min;
